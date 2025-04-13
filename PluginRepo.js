@@ -1,3 +1,4 @@
+
 /**
  * @name PluginRepo
  * @author DevilBro
@@ -62,10 +63,25 @@ module.exports = (_ => {
 	} : (([Plugin, BDFDB]) => {
 		return class PluginRepo extends Plugin {
 			onStart() {
-				if (BDFDB && BDFDB.PluginUtils && typeof BDFDB.PluginUtils.openPluginRepo === "function") {
-					BDFDB.PluginUtils.openPluginRepo(this.name);
+				if (BDFDB && BDFDB.ReactUtils && BDFDB.ReactUtils.createElement && BDFDB.ModalUtils) {
+					BDFDB.ModalUtils.open(this, {
+						header: "Plugin Repo (Restored)",
+						children: [
+							BDFDB.ReactUtils.createElement("div", {
+								style: { padding: "10px", color: "var(--header-primary)" },
+								children: Object.values(BdApi.Plugins.getAll()).map(p =>
+									BDFDB.ReactUtils.createElement("div", {
+										children: `${p.name} v${p.version} - ${BdApi.Plugins.isEnabled(p.name) ? "Enabled" : "Disabled"}`
+									})
+								)
+							})
+						],
+						buttons: [
+							{contents: "Close", close: true, color: "GREY"}
+						]
+					});
 				} else {
-					BdApi.UI.alert("Plugin Repo", "BDFDB failed to load plugin browser.");
+					BdApi.UI.alert("Plugin Repo", "Could not load BDFDB interfaces.");
 				}
 			}
 			onStop() {}
